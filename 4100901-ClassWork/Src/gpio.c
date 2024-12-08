@@ -1,43 +1,5 @@
 #include "gpio.h"
-<<<<<<< HEAD
-#include "systick.h"
 
-typedef struct {
-    volatile uint32_t MEMRMP;
-    volatile uint32_t CFGR1;
-    volatile uint32_t EXTICR[4];
-    volatile uint32_t CFGR2;
-} SYSCFG_t;
-
-typedef struct {
-    volatile uint32_t IMR1;
-    volatile uint32_t EMR1;
-    volatile uint32_t RTSR1;
-    volatile uint32_t FTSR1;
-    volatile uint32_t SWIER1;
-    volatile uint32_t PR1;
-    volatile uint32_t IMR2;
-    volatile uint32_t EMR2;
-    volatile uint32_t RTSR2;
-    volatile uint32_t FTSR2;
-    volatile uint32_t SWIER2;
-    volatile uint32_t PR2;
-} EXTI_t;
-
-
-
-#define RCC_BASE 0x40021000
-#define RCC_AHB2ENR ((uint32_t *)(RCC_BASE + 0x4C))
-#define RCC_APB2ENR ((uint32_t *)(RCC_BASE + 0x60))
-
-#define SYSCFG_BASE 0x40010000
-#define SYSCFG ((SYSCFG_t *)SYSCFG_BASE)
-
-
-//
-=======
-
->>>>>>> 23a42f6a6299a7236a8e71a8c320f2af2c881527
 #define EXTI_BASE 0x40010400
 #define EXTI ((EXTI_t *)EXTI_BASE)
 
@@ -48,13 +10,10 @@ typedef struct {
 volatile uint16_t button_pressed = 0; // Flag to indicate button press
 =======
 
-#define RCC_APB2ENR ((uint32_t *)(RCC_BASE + 0x60)) // APB2 peripheral clock enable register
 
 #define SYSCFG_BASE 0x40010000
 #define SYSCFG ((SYSCFG_t *)SYSCFG_BASE)
 
-#define RCC_BASE 0x40021000
-#define RCC_AHB2ENR ((uint32_t *)(RCC_BASE + 0x4C))
 
 #define GPIOA ((GPIO_t *)0x48000000) // Base address of GPIOA
 #define GPIOC ((GPIO_t *)0x48000800) // Base address of GPIOC
@@ -67,7 +26,6 @@ volatile uint16_t button_pressed = 0; // Flag to indicate button press
 #define TOGGLE_LED()           (GPIOA->ODR ^= (1 << LED_PIN))
 
 volatile uint8_t button_pressed = 0; // Flag to indicate button press
->>>>>>> 23a42f6a6299a7236a8e71a8c320f2af2c881527
 
 void init_gpio_pin(GPIO_t *GPIOx, uint8_t pin, uint8_t mode)
 {
@@ -98,6 +56,8 @@ void configure_gpio(void)
 
     // Enable EXTI15_10 interrupt
     *NVIC_ISER1 |= (1 << (EXTI15_10_IRQn - 32));
+
+    configure_gpio_for_usart();
 }
 
 <<<<<<< HEAD

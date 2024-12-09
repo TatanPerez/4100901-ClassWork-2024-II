@@ -1,6 +1,7 @@
-#include <stdint.h>
+//#include <stdint.h>
 #include "gpio.h"
 #include "rcc.h"
+
 
 #define EXTI_BASE 0x40010400
 #define EXTI ((EXTI_t *)EXTI_BASE)

@@ -1,14 +1,12 @@
+#include <stdint.h>
 #include "gpio.h"
+#include "rcc.h"
 
 #define EXTI_BASE 0x40010400
 #define EXTI ((EXTI_t *)EXTI_BASE)
 
 #define EXTI15_10_IRQn 40
 #define NVIC_ISER1 ((uint32_t *)(0xE000E104)) // NVIC Interrupt Set-Enable Register
-
-<<<<<<< HEAD
-volatile uint16_t button_pressed = 0; // Flag to indicate button press
-=======
 
 
 #define SYSCFG_BASE 0x40010000
@@ -26,6 +24,33 @@ volatile uint16_t button_pressed = 0; // Flag to indicate button press
 #define TOGGLE_LED()           (GPIOA->ODR ^= (1 << LED_PIN))
 
 volatile uint8_t button_pressed = 0; // Flag to indicate button press
+
+void configure_gpio_for_usart() {
+    // Enable GPIOA clock
+    *RCC_AHB2ENR |= (1 << 0);
+
+    // Configure PA2 (TX) as alternate function
+    GPIOA->MODER &= ~(3U << (2 * 2)); // Clear mode bits for PA2
+    GPIOA->MODER |= (2U << (2 * 2));  // Set alternate function mode for PA2
+
+    // Configure PA3 (RX) as alternate function
+    GPIOA->MODER &= ~(3U << (3 * 2)); // Clear mode bits for PA3
+    GPIOA->MODER |= (2U << (3 * 2));  // Set alternate function mode for PA3
+
+    // Set alternate function to AF7 for PA2 and PA3
+    GPIOA->AFR[0] &= ~(0xF << (4 * 2)); // Clear AFR bits for PA2
+    GPIOA->AFR[0] |= (7U << (4 * 2));   // Set AFR to AF7 for PA2
+    GPIOA->AFR[0] &= ~(0xF << (4 * 3)); // Clear AFR bits for PA3
+    GPIOA->AFR[0] |= (7U << (4 * 3));   // Set AFR to AF7 for PA3
+
+    // Configure PA2 and PA3 as very high speed
+    GPIOA->OSPEEDR |= (3U << (2 * 2)); // Very high speed for PA2
+    GPIOA->OSPEEDR |= (3U << (3 * 2)); // Very high speed for PA3
+
+    // Configure PA2 and PA3 as no pull-up, no pull-down
+    GPIOA->PUPDR &= ~(3U << (2 * 2)); // No pull-up, no pull-down for PA2
+    GPIOA->PUPDR &= ~(3U << (3 * 2)); // No pull-up, no pull-down for PA3
+}
 
 void init_gpio_pin(GPIO_t *GPIOx, uint8_t pin, uint8_t mode)
 {
@@ -60,8 +85,6 @@ void configure_gpio(void)
     configure_gpio_for_usart();
 }
 
-<<<<<<< HEAD
-=======
 uint8_t gpio_button_is_pressed(void)
 {
     return BUTTON_IS_PRESSED();
@@ -72,7 +95,6 @@ void gpio_toggle_led(void)
     TOGGLE_LED();
 }
 
->>>>>>> 23a42f6a6299a7236a8e71a8c320f2af2c881527
 void EXTI15_10_IRQHandler(void)
 {
     if (EXTI->PR1 & (1 << BUTTON_PIN)) {
@@ -80,20 +102,3 @@ void EXTI15_10_IRQHandler(void)
         button_pressed = 1; // Set button pressed flag
     }
 }
-<<<<<<< HEAD
-
-uint16_t button_Getpressed(void) {
-    return button_pressed;
-}
-
-uint16_t button_pressed_flag(void)    // Set button pressed flag
-{
-    return button_pressed != 0;
-}
-
-void Clear_button_pressed(void) // Clear button pressed flag
-{
-    button_pressed = 0;
-}
-=======
->>>>>>> 23a42f6a6299a7236a8e71a8c320f2af2c881527

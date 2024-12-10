@@ -9,6 +9,7 @@ int main(void)
     UART_Init(USART2);  
     uint8_t state = 0; // state of the FSM
     UART_send_string(USART2, "Hello World, from main!\r\n");
+
     while (1) {
         //handle_states();
         

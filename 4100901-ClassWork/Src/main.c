@@ -2,11 +2,15 @@
 #include "systick.h"
 #include "gpio.h"
 #include "uart.h"
+
+
 int main(void)
 {
     configure_systick_and_start();
     configure_gpio();
-    UART_Init(USART2);  
+    
+    UART_Init(USART2);
+
     uint8_t state = 0; // state of the FSM
     UART_send_string(USART2, "Hello World, from main!\r\n");
 
@@ -14,11 +18,18 @@ int main(void)
     UART_receive_string(USART2, buffer, 10);
 
     UART_send_string(USART2, "Received: ");
-    UART_send_string(USART2, buffer);
+    UART_send_string(USART2, (char *)buffer);
     UART_send_string(USART2, "\r\n");
 
     UART_receive_it(USART2, buffer, 10);
     while (1) {
+        if (rx_ready != 0) {
+            UART_send_string(USART2, "Received: ");
+            UART_send_string(USART2, (char *)buffer);
+            UART_send_string(USART2, "\r\n");
+            UART_receive_it(USART2, buffer, 10);
+            rx_ready = 0;
+        }
         switch (state) {
         case 0: // idle
             if (gpio_button_is_pressed() != 0) { // If button is pressed
